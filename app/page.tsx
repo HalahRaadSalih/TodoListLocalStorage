@@ -41,6 +41,7 @@ const itemsReducer = (items: Item[], action: ItemAction) => {
     }
 
     case ItemActionType.remove: {
+      // when an item is removed, do we need to update the ids of the remaining items with new index value
       return [...items.slice(0, idx), ...items.slice(idx + 1)];
     }
   }
@@ -54,11 +55,16 @@ interface useItemsLocalStorageRetrun {
 }
 
 const useItemsLocalStorage = (): useItemsLocalStorageRetrun => {
+  // this hook is added to isolate the business logic of adding/removing/updating items from component
+  // this enables us to have better speratation of concerns
+  // and easily mock and test todos and local storage updates without the component
+
   if (!localStorage.getItem(ITEMS_KEY)) {
     localStorage.setItem(ITEMS_KEY, JSON.stringify(INITIAL_ITEMS));
   }
 
   const initialItems = JSON.parse(localStorage.getItem(ITEMS_KEY) ?? "");
+  // useReducer is used here for code orgnaization and making debugging easier. We can due without it
   const [items, dispatch] = useReducer(itemsReducer, initialItems);
   const addItem = (text: string) => {
     const nextId = items[items.length - 1] ? items[items.length - 1].id + 1 : 0;
@@ -69,7 +75,7 @@ const useItemsLocalStorage = (): useItemsLocalStorageRetrun => {
       checked: false,
     });
   };
-
+  // we can use useCallback to memo all these event callbacks, but that's useful when there an expensive calculation
   const updateItem = useCallback((item: Item, idx: number) => {
     dispatch({
       type: ItemActionType.update,
