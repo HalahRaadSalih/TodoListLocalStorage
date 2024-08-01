@@ -1,38 +1,22 @@
 "use client";
-
-import { useCallback, useState } from "react";
 import TodoItem from "./TodoItem";
 import AddItem from "./AddItem";
 
-type Item = {
+export type Item = {
   id: number;
   text: string;
+  checked: boolean;
 };
 
-const TodoList = () => {
-  const [items, setItems] = useState<Item[]>([
-    { id: 0, text: "Do the laundry" },
-  ]);
+interface TodoListProps {
+  items: Item[];
+  onAddItem: (text: string) => void;
+  onRemoveItem: (idx: number) => void;
+  onCheckedItem: (item: Item, idx: number) => void;
+}
 
-  const addItem = useCallback(
-    (text: string) => {
-      setItems((items) => {
-        const nextId = items[items.length - 1]
-          ? items[items.length - 1].id + 1
-          : 0;
-
-        return [
-          ...items,
-          {
-            text,
-            id: nextId,
-          },
-        ];
-      });
-    },
-    [setItems]
-  );
-
+const TodoList = (props: TodoListProps) => {
+  const { items, onAddItem, onRemoveItem, onCheckedItem } = props;
   return (
     <>
       <h1 className="text-2xl mb-2">Todo</h1>
@@ -41,14 +25,13 @@ const TodoList = () => {
           {items.map((item, idx) => (
             <TodoItem
               key={idx}
-              item={item.text}
-              onDelete={() => {
-                setItems([...items.slice(0, idx), ...items.slice(idx + 1)]);
-              }}
+              item={item}
+              onDelete={() => onRemoveItem(idx)}
+              onChecked={() => onCheckedItem(item, idx)}
             />
           ))}
         </div>
-        <AddItem onAdd={addItem} />
+        <AddItem onAdd={(text) => onAddItem(text)} />
       </div>
     </>
   );

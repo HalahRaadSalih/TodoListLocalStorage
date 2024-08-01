@@ -1,27 +1,27 @@
 "use client";
-
-import { useState } from "react";
 import { RedButton } from "./Button";
+import { Item } from "./TodoList";
 
-const TodoItem = ({
-  item,
-  onDelete,
-}: {
-  item: string;
+interface TodoItemProps {
+  item: Item;
   onDelete: () => void;
-}) => {
-  const [checked, setChecked] = useState(false);
-  const toggleChecked = () => setChecked((c) => !c);
+  onChecked: (item: Item) => void;
+}
 
+const TodoItem = (props: TodoItemProps) => {
+  const { item, onDelete, onChecked } = props;
+  const { checked, text } = item;
   return (
     <div
-      onClick={() => toggleChecked()}
+      onClick={() => {
+        onChecked(item);
+      }}
       className={`flex justify-between items-center gap-1 text-sm w-full cursor-pointer ${
         checked ? "opacity-50" : ""
       }`}
     >
       <input checked={checked} className="cursor-pointer" type="checkbox" />
-      <span className={`flex-1 ${checked ? "line-through" : ""}`}>{item}</span>
+      <span className={`flex-1 ${checked ? "line-through" : ""}`}>{text}</span>
       <RedButton
         color="red"
         onClick={(e) => {
@@ -29,7 +29,7 @@ const TodoItem = ({
           e.stopPropagation();
         }}
       >
-        del
+        delete
       </RedButton>
     </div>
   );
